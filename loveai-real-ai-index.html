@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoveAI — Girlfriend Chat Prototype</title>
+<style>
+:root{--bg:#070d24;--panel:#101a3a;--panel2:#15234b;--text:#f7f8ff;--muted:#aab6da;--pink:#ff35b8;--purple:#895cff;--line:#30416f;--green:#45e6a5}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#342052,transparent 38%),var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.nav{height:72px;padding:0 7%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#070d24e8;backdrop-filter:blur(15px)}.logo{font-size:25px;font-weight:850}.logo span{color:var(--pink)}.nav small{color:var(--muted)}
+.page{max-width:1080px;margin:auto;padding:48px 7%}.hero{text-align:center;max-width:720px;margin:0 auto 38px}.eyebrow{color:#ff91dc;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.hero h1{font-size:clamp(38px,6vw,64px);line-height:1.05;letter-spacing:-2.5px;margin:16px 0}.hero h1 span{background:linear-gradient(90deg,#fff,#ff4cc2,#a58cff);background-clip:text;color:transparent}.hero p{color:var(--muted);line-height:1.7}
+.btn{border:0;border-radius:999px;padding:13px 22px;font-weight:800;color:#fff;background:linear-gradient(100deg,var(--purple),var(--pink));box-shadow:0 8px 28px #ff35b82b}.btn.secondary{background:transparent;border:1px solid #53669a;box-shadow:none}
+.create-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:linear-gradient(145deg,#111d40,#0c1531);border:1px solid var(--line);border-radius:22px;padding:25px}.card h2{margin-top:0}.card p{color:var(--muted);font-size:14px;line-height:1.6}label{display:block;color:#d7def7;font-size:13px;font-weight:750;margin:18px 0 8px}input,select{width:100%;padding:13px;border:1px solid #3b4d7e;border-radius:12px;background:#09132d;color:#fff;outline:none}.choices{display:flex;gap:8px;flex-wrap:wrap}.choice{border:1px solid #3a4a78;border-radius:999px;padding:10px 13px;background:#101d40;color:#dce3ff}.choice.active{border-color:var(--pink);background:#70245f}
+.preview{min-height:390px;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(circle at 50% 25%,#a0478b55,transparent 35%),linear-gradient(145deg,#26345e,#101832);overflow:hidden}.preview-avatar{height:260px;display:grid;place-items:center;font-size:130px;background:linear-gradient(145deg,#dfadad,#4a2b59);border-radius:180px 180px 0 0;margin:20px 25px 0}.profile{background:#0a1430e8;border:1px solid #46598c;border-radius:18px;padding:18px}.profile b{font-size:21px}.profile small{display:block;color:var(--muted);margin-top:5px}
+.chat-page{height:calc(100vh - 72px);max-width:850px;margin:auto;padding:24px 5%;display:flex;flex-direction:column}.chat-top{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px 0}.person{display:flex;align-items:center;gap:12px}.person-avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#e8b0bd,#58305d);font-size:27px}.person small{color:var(--muted)}.online{color:var(--green);font-size:12px}.chatbox{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:23px;overflow:hidden;background:#09132d}.messages{flex:1;overflow:auto;padding:22px}.msg{max-width:78%;padding:12px 15px;border-radius:17px;margin:10px 0;font-size:14px;line-height:1.5}.bot{background:#1b2b53}.user{margin-left:auto;background:linear-gradient(100deg,#6637bf,#c52d9b)}.composer{display:flex;gap:8px;padding:13px;border-top:1px solid var(--line)}.composer input{min-width:0}.back{color:#cbd5f6;background:none;border:0;font-size:14px}
+@media(max-width:760px){.nav{padding:0 5%}.page{padding:35px 5%}.create-grid{grid-template-columns:1fr}.preview{min-height:350px}.chat-page{padding:12px 3%}.msg{max-width:88%}}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="logo">💗 Love<span>AI</span></div><small id="navText">Create your companion</small></nav>
+
+<!-- PAGE 1: CREATE -->
+<section id="createPage" class="page">
+  <div class="hero">
+    <div class="eyebrow">Your companion, your way</div>
+    <h1>Create your <span>AI Girlfriend</span> ♡</h1>
+    <p>Choose her name, appearance, and personality. When you finish, you’ll be taken to a separate chat page made just for your companion.</p>
+  </div>
+  <div class="create-grid">
+    <div class="card">
+      <h2>Customize her</h2>
+      <label for="name">Her name</label>
+      <input id="name" maxlength="20" placeholder="e.g. Emma" oninput="updatePreview()">
+
+      <label>Appearance</label>
+      <div class="choices" id="appearanceChoices"></div>
+
+      <label>Personality</label>
+      <div class="choices" id="personalityChoices"></div>
+
+      <label for="tone">Conversation style</label>
+      <select id="tone"><option>Sweet & Romantic</option><option>Friendly & Casual</option><option>Playful & Funny</option><option>Calm & Caring</option></select>
+
+      <button class="btn" style="width:100%;margin-top:25px" onclick="finishCreation()">Create Girlfriend & Continue →</button>
+    </div>
+
+    <div class="card preview">
+      <div>
+        <h2>Your preview</h2>
+        <p>See your companion’s profile before entering the chat.</p>
+        <div class="preview-avatar" id="avatar">🌸</div>
+      </div>
+      <div class="profile"><b id="previewName">Emma</b><small id="previewDetails">Realistic · Romantic</small><p id="previewGreeting">Hi! I’m Emma. I’m happy to meet you 💗</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 2: CHAT -->
+<section id="chatPage" class="chat-page hidden">
+  <div class="chat-top">
+    <button class="back" onclick="backToCreate()">← Edit girlfriend</button>
+    <div class="person"><div class="person-avatar" id="chatAvatar">🌸</div><div><b id="chatName">Emma</b><br><span class="online">● Online</span></div></div>
+    <button class="btn secondary" onclick="resetChat()">New chat</button>
+  </div>
+  <div class="chatbox">
+    <div class="messages" id="messages"></div>
+    <div class="composer"><input id="messageInput" placeholder="Message your girlfriend..." onkeydown="if(event.key==='Enter')sendMessage()"><button class="btn" onclick="sendMessage()">➤</button></div>
+  </div>
+</section>
+
+<script>
+const appearances=['Realistic','Anime','3D Character','Cute'];
+const personalities=['Romantic','Caring','Playful','Shy','Confident','Funny'];
+let appearance='Realistic', personality='Romantic', companionName='Emma';
+
+function choices(){
+ document.getElementById('appearanceChoices').innerHTML=appearances.map(x=>`<button class="choice ${x===appearance?'active':''}" onclick="select('appearance','${x}')">${x}</button>`).join('');
+ document.getElementById('personalityChoices').innerHTML=personalities.map(x=>`<button class="choice ${x===personality?'active':''}" onclick="select('personality','${x}')">${x}</button>`).join('');
+}
+function select(type,value){if(type==='appearance')appearance=value;else personality=value;choices();updatePreview()}
+function updatePreview(){
+ const name=document.getElementById('name').value.trim()||'Emma';
+ document.getElementById('previewName').textContent=name;
+ document.getElementById('previewDetails').textContent=appearance+' · '+personality;
+ document.getElementById('previewGreeting').textContent=`Hi! I’m ${name}. I’m happy to meet you 💗`;
+ document.getElementById('avatar').textContent=appearance==='Anime'?'🌸':appearance==='Cute'?'🐱':appearance==='3D Character'?'✨':'👩🏻';
+}
+function finishCreation(){
+ companionName=document.getElementById('name').value.trim()||'Emma';
+ document.getElementById('chatName').textContent=companionName;
+ document.getElementById('chatAvatar').textContent=appearance==='Anime'?'🌸':appearance==='Cute'?'🐱':appearance==='3D Character'?'✨':'👩🏻';
+ document.getElementById('createPage').classList.add('hidden');
+ document.getElementById('chatPage').classList.remove('hidden');
+ document.getElementById('navText').textContent='Your private chat space';
+ resetChat();
+}
+function resetChat(){
+ const tone=document.getElementById('tone').value;
+ document.getElementById('messages').innerHTML='';
+ addMessage(`Hi! I’m ${companionName} 💗 I’m so happy you created me. What would you like to talk about?`,'bot');
+ addMessage(`My personality is ${personality.toLowerCase()} and my style is ${tone.toLowerCase()}.`,'bot');
+}
+function addMessage(text,type){const box=document.getElementById('messages');const div=document.createElement('div');div.className='msg '+type;div.textContent=text;box.appendChild(div);box.scrollTop=box.scrollHeight}
+async function sendMessage(){
+ const input=document.getElementById('messageInput'),text=input.value.trim();if(!text)return;
+ addMessage(text,'user');input.value='';
+ addMessage('Typing… 💗','bot');
+ try{
+  const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,name:companionName,personality,appearance,tone:document.getElementById('tone').value})});
+  const data=await response.json();
+  document.querySelectorAll('.msg.bot').forEach(el=>{if(el.textContent==='Typing… 💗')el.remove()});
+  addMessage(data.reply||'Sorry, I could not reply right now.','bot');
+ }catch(error){
+  document.querySelectorAll('.msg.bot').forEach(el=>{if(el.textContent==='Typing… 💗')el.remove()});
+  addMessage('Sorry, something went wrong. Please try again.','bot');
+ }
+}
+function backToCreate(){document.getElementById('chatPage').classList.add('hidden');document.getElementById('createPage').classList.remove('hidden');document.getElementById('navText').textContent='Create your companion'}
+choices();updatePreview();
+</script>
+</body>
+</html>
